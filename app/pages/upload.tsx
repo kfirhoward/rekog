@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import axios from 'axios';
+import { log } from "console";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 const UploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -12,7 +15,6 @@ const UploadPage: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!file) {
       alert("Please select a file");
       return;
@@ -20,29 +22,28 @@ const UploadPage: React.FC = () => {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
-
-      // Your upload function
+      formData.append('files', file);
+      console.log(formData)
       await uploadImage(formData);
 
-      // Clear the file input
-      setFile(null);
     } catch (error) {
       console.error("Error uploading image:", error);
       // Handle error
     }
   };
 
+
   const uploadImage = async (formData: FormData) => {
-    try {
-        console.log("api- ",API_URL)
-        const response = await fetch(API_URL + "/upload", {method:"POST", body:formData})
-    
-        console.log("Image uploaded successfully");
-    }   catch (error) {
-        throw new Error("Error uploading image");
-    }
-  };
+      try {
+          console.log(formData)
+          const response = await axios.post(API_URL + '/upload',formData,{headers: {
+            'Content-Type': 'multipart/form-data'}
+          }) 
+          console.log("response:",response.data)
+      }   catch (error) {
+          throw new Error("Error uploading image");
+      }
+    };
 
   return (
     <div>
